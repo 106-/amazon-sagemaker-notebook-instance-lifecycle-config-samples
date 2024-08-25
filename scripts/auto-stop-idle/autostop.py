@@ -11,6 +11,7 @@
 #     express or implied. See the License for the specific language governing
 #     permissions and limitations under the License.
 
+import os
 import requests
 from datetime import datetime
 import getopt, sys
@@ -41,6 +42,7 @@ helpInfo = """-t, --time
 idle = True
 port = '8443'
 ignore_connections = False
+slack_webhook = False
 try:
     opts, args = getopt.getopt(sys.argv[1:], "ht:p:c", ["help","time=","port=","ignore-connections"])
     if len(opts) == 0:
@@ -55,6 +57,8 @@ try:
             port = str(arg)
         if opt in ("-c", "--ignore-connections"):
             ignore_connections = True
+        if opt in ("-s", "--slack-webhook"):
+            slack_webhook = str(arg)
 except getopt.GetoptError:
     print(usageInfo)
     exit(1)
@@ -138,5 +142,14 @@ if idle:
     client.stop_notebook_instance(
         NotebookInstanceName=get_notebook_name()
     )
+
+    if slack_webhook:
+        current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        message = f"<!here> notebook was terminated! {current_time}"
+        payload = {
+            "text": message
+        }
+        response = requests.post(slack_webhook, json=payload)
+
 else:
     print('Notebook not idle. Pass.')
