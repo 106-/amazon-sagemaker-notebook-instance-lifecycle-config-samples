@@ -146,8 +146,7 @@ if idle:
     )
 
     if slack_webhook:
-        current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        message = f"<!here> notebook was terminated! {current_time}"
+        message = f"<!here> notebook was terminated!"
         payload = {
             "text": message
         }
