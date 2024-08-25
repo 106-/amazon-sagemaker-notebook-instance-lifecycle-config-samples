@@ -36,6 +36,8 @@ helpInfo = """-t, --time
     Stop notebook once idle, ignore connected users
 -h, --help
     Help information
+-s, --slack-webhook
+    Specify the Slack Webhook URL to send a notification when the notebook instance is terminated.
 """
 
 # Read in command-line parameters
@@ -44,7 +46,7 @@ port = '8443'
 ignore_connections = False
 slack_webhook = False
 try:
-    opts, args = getopt.getopt(sys.argv[1:], "ht:p:c", ["help","time=","port=","ignore-connections"])
+    opts, args = getopt.getopt(sys.argv[1:], "ht:p:cs:", ["help","time=","port=","ignore-connections", "slack-webhook="])
     if len(opts) == 0:
         raise getopt.GetoptError("No input parameters!")
     for opt, arg in opts:
