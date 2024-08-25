@@ -77,6 +77,12 @@ def is_idle(last_activity):
         print('Notebook is not idle. Last activity time = ', last_activity)
         return False
 
+def is_terminal_state(response):
+    for terminal in response:
+        print(terminal)
+        if is_idle(terminal["last_activity"]):
+            return True
+    return False
 
 def get_notebook_name():
     log_path = '/opt/ml/metadata/resource-metadata.json'
@@ -114,6 +120,17 @@ else:
     if not is_idle(uptime.strftime("%Y-%m-%dT%H:%M:%S.%fz")):
         idle = False
         print('Notebook idle state set as %s since no sessions detected.' % idle)
+
+# https://github.com/takeru1205/amazon-sagemaker-notebook-instance-lifecycle-config-samples/blob/29c0c87b0c4ae9419ae43ab0c92ba286fd23caf8/scripts/auto-stop-idle/autostop.py
+# Check terminals is idle or not
+terminal_response = requests.get(
+    f"https://localhost:{port}/api/terminals",
+    verify=False,
+)
+terminal_data = terminal_response.json()
+terminal_idle = is_terminal_state(terminal_data) if terminal_data else True
+
+idle = idle and terminal_idle
 
 if idle:
     print('Closing idle notebook')
